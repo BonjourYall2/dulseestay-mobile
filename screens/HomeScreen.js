@@ -1,26 +1,29 @@
 import { useEffect, useState } from "react";
 
 import {
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 
 import { addDoc, collection, getDocs } from "firebase/firestore";
 
-import { db } from "../firebase/config";
+import { auth, db } from "../firebase/config";
 
 function HomeScreen() {
   const [rooms, setRooms] = useState([]);
 
   const [search, setSearch] = useState("");
+
+  const [refreshing, setRefreshing] = useState(false);
 
   // GET ROOMS
   const getRooms = async () => {
@@ -44,6 +47,15 @@ function HomeScreen() {
     getRooms();
   }, []);
 
+  // REFRESH
+  const onRefresh = async () => {
+    setRefreshing(true);
+
+    await getRooms();
+
+    setRefreshing(false);
+  };
+
   // BOOK ROOM
   const bookRoom = async (room) => {
     try {
@@ -56,7 +68,9 @@ function HomeScreen() {
 
         image: room.image,
 
-        userName: "Sample User",
+        userName: auth.currentUser?.email,
+
+        userEmail: auth.currentUser?.email,
 
         checkIn: "May 26 2026",
 
@@ -81,7 +95,12 @@ function HomeScreen() {
   );
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       {/* HEADER */}
 
       <View style={styles.header}>
@@ -111,7 +130,12 @@ function HomeScreen() {
 
       {filteredRooms.map((item) => (
         <View key={item.id} style={styles.card}>
-          <Image source={{ uri: item.image }} style={styles.image} />
+          <Image
+            source={{
+              uri: item.image,
+            }}
+            style={styles.image}
+          />
 
           <View style={styles.cardContent}>
             <Text style={styles.roomName}>{item.name}</Text>
@@ -209,7 +233,7 @@ const styles = StyleSheet.create({
   },
 
   button: {
-    backgroundColor: "#2F80ED",
+    backgroundColor: "#2563EB",
     padding: 18,
     borderRadius: 18,
     alignItems: "center",

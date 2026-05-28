@@ -2,11 +2,13 @@ import { initializeApp } from "firebase/app";
 
 import { getFirestore } from "firebase/firestore";
 
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
+
 const firebaseConfig = {
   apiKey: "AIzaSyBxqFvSpQuGHCGMEjpx_P9MBbPtoTHY9o0",
   authDomain: "dulsee-stay-5e318.firebaseapp.com",
   databaseURL:
-    "https://dulsee-stay-5e318-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "https://dulsee-stay-5e318-default-rtdb.asia-southeast1.firebasedatabase.app/",
   projectId: "dulsee-stay-5e318",
   storageBucket: "dulsee-stay-5e318.firebasestorage.app",
   messagingSenderId: "928478941642",
@@ -15,4 +17,11 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+const auth = getAuth(app);
+
+const googleProvider = new GoogleAuthProvider();
+
+export { auth, db, googleProvider };
+
